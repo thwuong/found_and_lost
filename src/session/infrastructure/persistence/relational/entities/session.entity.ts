@@ -1,11 +1,11 @@
 import {
+  Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   ManyToOne,
   PrimaryGeneratedColumn,
-  DeleteDateColumn,
-  Column,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
@@ -16,8 +16,8 @@ import { EntityRelationalHelper } from '../../../../../utils/relational-entity-h
   name: 'session',
 })
 export class SessionEntity extends EntityRelationalHelper {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => UserEntity, {
     eager: true,
