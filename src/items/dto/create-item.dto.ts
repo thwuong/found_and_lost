@@ -5,11 +5,6 @@ export class CreateItemDto {
   // Don't forget to use the class-validator decorators in the DTO properties.
   @ApiProperty({
     type: String,
-  })
-  userId: string;
-
-  @ApiProperty({
-    type: String,
     enum: ['FOUND', 'LOST'],
   })
   @IsNotEmpty()
@@ -51,4 +46,11 @@ export class CreateItemDto {
   })
   @IsNotEmpty()
   foundLostDate: Date;
+
+  @ApiProperty({
+    type: String,
+    enum: ['LOW', 'MEDIUM', 'HIGH'],
+    default: 'MEDIUM',
+  })
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
 }

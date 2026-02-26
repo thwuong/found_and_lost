@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -28,8 +29,6 @@ import { CreateItemDto } from './dto/create-item.dto';
 import { FindAllItemsDto } from './dto/find-all-items.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { ItemsService } from './items.service';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { JwtPayloadType } from '../auth/strategies/types/jwt-payload.type';
 
 @ApiTags('Items')
 @ApiBearerAuth()
@@ -46,20 +45,11 @@ export class ItemsController {
   @ApiCreatedResponse({
     type: Item,
   })
-  create(
-    @CurrentUser() user: JwtPayloadType,
-    @Body() createItemDto: CreateItemDto,
-  ) {
-    const userIdString = user.id.toString();
-    // ✅ Sử dụng logger instance với nhiều level
-    console.log('ItemsController initialized');
-
-    this.logger.log(`Creating item for user: ${userIdString}`);
+  @UseGuards(AuthGuard('jwt'))
+  create(@Request() request, @Body() createItemDto: CreateItemDto) {
+    this.logger.log(`Creating item for user: ${request.user.id}`);
     this.logger.debug(`CreateItemDto: ${JSON.stringify(createItemDto)}`);
-    return this.itemsService.create({
-      ...createItemDto,
-      userId: userIdString,
-    });
+    return this.itemsService.create(createItemDto, request.user.id);
   }
 
   @Get()
@@ -67,11 +57,10 @@ export class ItemsController {
     type: InfinityPaginationResponse(Item),
   })
   async findAll(
-    @CurrentUser() user: JwtPayloadType,
+    @Request() request,
     @Query() query: FindAllItemsDto,
   ): Promise<InfinityPaginationResponseDto<Item>> {
-    const userIdString = user.id.toString();
-    this.logger.log(`Finding all items for user: ${userIdString}`);
+    this.logger.log(`Finding all items for user: ${request.user.id}`);
     const page = query?.page ?? 1;
     let limit = query?.limit ?? 10;
     if (limit > 50) {

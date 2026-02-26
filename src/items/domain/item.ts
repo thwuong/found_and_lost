@@ -1,15 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { PrimaryGeneratedColumn } from 'typeorm';
+import { User } from '../../users/domain/user';
 
 export class Item {
-  @ApiProperty({
-    type: String,
-  })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ApiProperty({
-    type: String,
+    type: () => User,
   })
-  userId: string;
+  user: User;
 
   @ApiProperty({
     type: String,
@@ -66,4 +66,7 @@ export class Item {
 
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiProperty()
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
 }

@@ -50,6 +50,13 @@ export class ItemEntity extends EntityRelationalHelper {
   @Column({ type: 'boolean', default: false })
   isClaimed: boolean;
 
+  @Column({
+    type: 'enum',
+    enum: ['LOW', 'MEDIUM', 'HIGH'],
+    default: 'MEDIUM',
+  })
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+
   @CreateDateColumn()
   createdAt: Date;
 

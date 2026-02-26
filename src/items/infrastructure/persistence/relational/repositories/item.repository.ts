@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
-import { ItemEntity } from '../entities/item.entity';
+import { In, Repository } from 'typeorm';
 import { NullableType } from '../../../../../utils/types/nullable.type';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
 import { Item } from '../../../../domain/item';
 import { ItemRepository } from '../../item.repository';
+import { ItemEntity } from '../entities/item.entity';
 import { ItemMapper } from '../mappers/item.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
 
 @Injectable()
 export class ItemRelationalRepository implements ItemRepository {
@@ -20,7 +20,10 @@ export class ItemRelationalRepository implements ItemRepository {
     const newEntity = await this.itemRepository.save(
       this.itemRepository.create(persistenceModel),
     );
-    return ItemMapper.toDomain(newEntity);
+    const loadedEntity = await this.itemRepository.findOne({
+      where: { id: newEntity.id },
+    });
+    return ItemMapper.toDomain(loadedEntity!);
   }
 
   async findAllWithPagination({
@@ -70,7 +73,11 @@ export class ItemRelationalRepository implements ItemRepository {
       ),
     );
 
-    return ItemMapper.toDomain(updatedEntity);
+    const loadedEntity = await this.itemRepository.findOne({
+      where: { id: updatedEntity.id },
+    });
+
+    return ItemMapper.toDomain(loadedEntity!);
   }
 
   async remove(id: Item['id']): Promise<void> {

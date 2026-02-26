@@ -3,6 +3,7 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
+import { User } from '../users/domain/user';
 import { IPaginationOptions } from '../utils/types/pagination-options';
 import { Item } from './domain/item';
 import { CreateItemDto } from './dto/create-item.dto';
@@ -16,22 +17,27 @@ export class ItemsService {
     private readonly itemRepository: ItemRepository,
   ) {}
 
-  async create(createItemDto: CreateItemDto) {
+  async create(createItemDto: CreateItemDto, userId: string) {
     Logger.log(createItemDto);
     // Do not remove comment below.
     // <creating-property />
 
-    return this.itemRepository.create({
-      userId: createItemDto.userId,
-      type: createItemDto.type,
-      title: createItemDto.title,
-      description: createItemDto.description,
-      category: createItemDto.category,
-      images: createItemDto.images,
-      foundLostDate: createItemDto.foundLostDate,
-      isClaimed: false,
-      claimedAt: null,
-    });
+    const item = new Item();
+    const user = new User();
+    user.id = userId;
+
+    item.user = user;
+    item.type = createItemDto.type;
+    item.title = createItemDto.title;
+    item.description = createItemDto.description;
+    item.category = createItemDto.category;
+    item.images = createItemDto.images;
+    item.foundLostDate = createItemDto.foundLostDate;
+    item.isClaimed = false;
+    item.claimedAt = null;
+    item.priority = createItemDto.priority;
+
+    return this.itemRepository.create(item);
   }
 
   findAllWithPagination({
